@@ -1,5 +1,3 @@
-const e = require("express");
-
 const chatForm = document.getElementById("chat-form");
 const chatMessages = document.querySelector(".chat-messages");
 

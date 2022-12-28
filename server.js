@@ -3,7 +3,12 @@ const path = require("path");
 const express = require("express");
 const socketio = require("socket.io");
 const formatMessage = require("./utils/messages");
-const { userJoin, getCurrentUser } = require("./utils/users");
+const {
+  userJoin,
+  getCurrentUser,
+  userLeave,
+  getRoomUsers,
+} = require("./utils/users");
 const bot = "Passing Notes Bot";
 
 const app = express();
@@ -20,15 +25,25 @@ io.on("connection", (socket) => {
 
     socket.broadcast
       .to(user.chatRoom)
-      .emit("message", formatMessage(bot, "A user has joined the chat!"));
+      .emit(
+        "message",
+        formatMessage(bot, `${user.userName} has joined the chat!`)
+      );
   });
 
   socket.on("note", (msg) => {
-    io.emit("message", formatMessage("User", msg));
+    const user = getCurrentUser(socket.id);
+    io.to(user.chatRoom).emit("message", formatMessage(user.userName, msg));
   });
 
   socket.on("disconnect", () => {
-    io.emit("message", formatMessage(bot, "A user has left the chat."));
+    const user = userLeave(socket.id);
+    if (user) {
+      io.to(user.chatRoom).emit(
+        "message",
+        formatMessage(bot, `${user.userName} has left the chat.`)
+      );
+    }
   });
 });
 
