@@ -1,6 +1,5 @@
 const daysjs = require("dayjs");
 let now = daysjs();
-console.log(now.format("h:mm:ss a"));
 
 function formatMessage(userName, txt) {
   return {
